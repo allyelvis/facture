@@ -90,3 +90,35 @@ function displayResults(data) {
     const resultsDiv = document.getElementById('managementResults');
     resultsDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
 }
+const express = require('express');
+const { Pool } = require('pg');
+const bodyParser = require('body-parser');
+
+const app = express();
+const port = 3000;
+
+const pool = new Pool({
+  user: 'your_username',
+  host: 'localhost',
+  database: 'your_database',
+  password: 'your_password',
+  port: 5432,
+});
+
+app.use(bodyParser.json());
+app.use(express.static('public'));  // Serve static files from 'public' folder
+
+app.post('/sellers', async (req, res) => {
+  const { name, address, nif, legalForm, tradeRegister, contact, vatSubjected } = req.body;
+  try {
+    await pool.query('INSERT INTO sellers (name, address, nif, legal_form, trade_register, contact, vat_subjected) VALUES ($1, $2, $3, $4, $5, $6, $7)', [name, address, nif, legalForm, tradeRegister, contact, vatSubjected]);
+    res.status(201).json({ message: 'Seller created successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/buyers', async (req, res) => {
+  const { name, address } = req.body;
+  try {
+    await pool.query('INSERT INTO buyers (name
