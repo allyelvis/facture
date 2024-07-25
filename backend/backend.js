@@ -121,4 +121,74 @@ app.post('/sellers', async (req, res) => {
 app.post('/buyers', async (req, res) => {
   const { name, address } = req.body;
   try {
-    await pool.query('INSERT INTO buyers (name
+    await pool.query('INSERT INTO buyers (name)
+                     // Assuming you have the fetch API set up to call EBMS functions
+const ebms = require('./ebms.js');
+
+document.getElementById('createInvoiceForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const invoice = {
+        sellerId: document.getElementById('sellerId').value,
+        buyerId: document.getElementById('buyerId').value,
+        invoiceDate: document.getElementById('invoiceDate').value,
+        items: Array.from(document.querySelectorAll('.item')).map(item => ({
+            name: item.querySelector('.itemName').value,
+            quantity: item.querySelector('.itemQuantity').value,
+            price: item.querySelector('.itemPrice').value
+        }))
+    };
+    try {
+        const invoiceResponse = await ebms.postInvoice(invoice);
+        alert(`Invoice Posted: ${JSON.stringify(invoiceResponse)}`);
+        for (let item of invoice.items) {
+            const stockMovement = {
+                itemCode: item.name,
+                quantity: item.quantity,
+                price: item.price,
+                invoiceId: invoiceResponse.invoiceId
+            };
+            const stockResponse = await ebms.postStockMovement(stockMovement);
+            alert(`Stock Movement Posted: ${JSON.stringify(stockResponse)}`);
+        }
+    } catch (error) {
+        console.error('Error posting to EBMS:', error);
+        alert(`Error: ${error.message}`);
+    }
+});
+
+function addItem() {
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'item';
+    itemDiv.innerHTML = `
+        <label for="itemName">Item Name:</label>
+        <input type="text" class="itemName" required><br>
+        <label for="itemQuantity">Item Quantity:</label>
+        <input type="number" class="itemQuantity" required><br>
+        <label for="itemPrice">Item Price:</label>
+        <input type="number" class="itemPrice" required><br>
+    `;
+    document.getElementById('items').appendChild(itemDiv);
+}
+
+async function listSellers() {
+    const response = await fetch('/sellers');
+    const sellers = await response.json();
+    displayResults(sellers);
+}
+
+async function listBuyers() {
+    const response = await fetch('/buyers');
+    const buyers = await response.json();
+    displayResults(buyers);
+}
+
+async function listInvoices() {
+    const response = await fetch('/invoices');
+    const invoices = await response.json();
+    displayResults(invoices);
+}
+
+function displayResults(data) {
+    const resultsDiv = document.getElementById('managementResults');
+    resultsDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+}
