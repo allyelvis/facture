@@ -316,3 +316,116 @@ app.get('/listInvoices', (req, res) => {
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}/`);
 });
+// Function to add a new item to the invoice
+function addItem() {
+    const itemsDiv = document.getElementById('items');
+    const itemDiv = document.createElement('div');
+    itemDiv.classList.add('item');
+    itemDiv.innerHTML = `
+        <h3>Item</h3>
+        <label for="itemName">Item Name:</label>
+        <input type="text" class="itemName" required><br>
+        <label for="itemQuantity">Quantity:</label>
+        <input type="number" class="itemQuantity" required><br>
+        <label for="itemPrice">Unit Price:</label>
+        <input type="number" class="itemPrice" required><br>
+        <button type="button" onclick="removeItem(this)">Remove Item</button>
+    `;
+    itemsDiv.appendChild(itemDiv);
+}
+
+// Function to remove an item from the invoice
+function removeItem(button) {
+    button.parentElement.remove();
+}
+
+// Function to generate and preview the invoice
+function generateInvoice(event) {
+    event.preventDefault();
+    
+    const sellerName = document.getElementById('sellerName').value;
+    const sellerAddress = document.getElementById('sellerAddress').value;
+    const companyNIF = document.getElementById('companyNIF').value;
+    const legalForm = document.getElementById('legalForm').value;
+    const tradeRegister = document.getElementById('tradeRegister').value;
+    const sellerContact = document.getElementById('sellerContact').value;
+    const vatSubjected = document.getElementById('vatSubjected').value;
+    const buyerName = document.getElementById('buyerName').value;
+    const buyerAddress = document.getElementById('buyerAddress').value;
+    const invoiceDate = document.getElementById('invoiceDate').value;
+
+    const items = Array.from(document.querySelectorAll('.item')).map(item => {
+        return {
+            name: item.querySelector('.itemName').value,
+            quantity: item.querySelector('.itemQuantity').value,
+            price: item.querySelector('.itemPrice').value
+        };
+    });
+
+    let invoicePreview = `
+        <h2>Invoice</h2>
+        <h3>Seller Information</h3>
+        <p>Name: ${sellerName}</p>
+        <p>Address: ${sellerAddress}</p>
+        <p>NIF: ${companyNIF}</p>
+        <p>Legal Form: ${legalForm}</p>
+        <p>Trade Register: ${tradeRegister}</p>
+        <p>Contact: ${sellerContact}</p>
+        <p>VAT Subjected: ${vatSubjected}</p>
+        <h3>Buyer Information</h3>
+        <p>Name: ${buyerName}</p>
+        <p>Address: ${buyerAddress}</p>
+        <h3>Invoice Date</h3>
+        <p>${invoiceDate}</p>
+        <h3>Items</h3>
+    `;
+
+    let totalAmount = 0;
+    items.forEach(item => {
+        const itemTotal = item.quantity * item.price;
+        totalAmount += itemTotal;
+        invoicePreview += `
+            <p>${item.name}: ${item.quantity} x ${item.price} = ${itemTotal}</p>
+        `;
+    });
+
+    invoicePreview += `<h3>Total Amount: ${totalAmount}</h3>`;
+
+    document.getElementById('invoicePreview').innerHTML = invoicePreview;
+}
+
+// Function to handle various management tasks
+function listInvoices() {
+    alert('List Invoices functionality is not yet implemented.');
+}
+
+function listProducts() {
+    alert('List Products functionality is not yet implemented.');
+}
+
+function listCustomers() {
+    alert('List Customers functionality is not yet implemented.');
+}
+
+function getPayment() {
+    alert('Get Payment functionality is not yet implemented.');
+}
+
+function generateBill() {
+    alert('Generate Bill functionality is not yet implemented.');
+}
+
+function printOrSaveBill() {
+    alert('Print/Save Bill functionality is not yet implemented.');
+}
+
+function listBills() {
+    alert('List Bills functionality is not yet implemented.');
+}
+
+function editOrder() {
+    alert('Edit Order functionality is not yet implemented.');
+}
+
+// Attach event listener to the form
+document.getElementById('invoiceForm').addEventListener('submit', generateInvoice);
